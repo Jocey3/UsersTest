@@ -2,8 +2,11 @@ package com.users.test.di
 
 import android.content.Context
 import androidx.room.Room
-import com.users.test.data.source.local.UsersDao
-import com.users.test.data.source.local.UsersDb
+import com.users.test.data.mapper.UserMapper
+import com.users.test.data.source.local.LocalDataSource
+import com.users.test.data.source.local.LocalDataSourceImpl
+import com.users.test.data.source.local.room.UsersDao
+import com.users.test.data.source.local.room.UsersDb
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -20,4 +23,9 @@ fun provideRoomDatabase(context: Context): UsersDb {
 
 private fun provideUsersDao(usersDb: UsersDb): UsersDao {
     return usersDb.usersDao()
+}
+
+val localDataSourceModule = module {
+    single<LocalDataSource> { LocalDataSourceImpl(get(), get()) }
+    single { UserMapper() }
 }

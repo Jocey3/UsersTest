@@ -1,4 +1,4 @@
-package com.users.test.data.source.local
+package com.users.test.data.source.local.room
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.users.test.data.source.local.entity.UserEntity
+import com.users.test.data.source.local.room.entity.UserEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
