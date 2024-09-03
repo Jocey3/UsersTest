@@ -17,7 +17,7 @@ class UserMapper() {
         return UserEntity(id = null, name = model.name, description = model.description)
     }
 
-    fun mapFromEntityToDomain(entity: UserEntity): UserDomainModel {
-        return UserDomainModel(name = entity.name, description = entity.description)
+    fun mapFromDomainToData(entity: UserDomainModel): UserDataModel {
+        return UserDataModel(name = entity.name, description = entity.description)
     }
 }
