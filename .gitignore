@@ -22,3 +22,4 @@ local.properties
 /.idea/kotlinc.xml
 /.idea/gradle.xml
 /.idea/deploymentTargetSelector.xml
+/.idea/inspectionProfiles/Project_Default.xml

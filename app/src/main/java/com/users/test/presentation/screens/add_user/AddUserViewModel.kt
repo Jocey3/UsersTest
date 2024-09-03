@@ -4,8 +4,13 @@ import com.users.test.domain.use_case.AddUserUseCase
 import com.users.test.presentation.mapper.UserMapper
 import com.users.test.presentation.mvi_base.BaseViewModel
 import com.users.test.presentation.screens.add_user.AddUserIntent.AddUser
+import com.users.test.presentation.screens.add_user.AddUserIntent.ChangeDescription
+import com.users.test.presentation.screens.add_user.AddUserIntent.ChangeName
 import com.users.test.presentation.screens.add_user.AddUserIntent.ChangeUser
+import com.users.test.presentation.screens.add_user.AddUserIntent.CompleteAddUser
 import com.users.test.presentation.screens.add_user.AddUserIntent.DeleteUser
+import com.users.test.presentation.screens.add_user.AddUserIntent.ValidateDescription
+import com.users.test.presentation.screens.add_user.AddUserIntent.ValidateName
 
 class AddUserViewModel(private val addUserUseCase: AddUserUseCase, private val mapper: UserMapper) :
     BaseViewModel<AddUserState, AddUserIntent, AddUserEvent>() {
@@ -19,24 +24,41 @@ class AddUserViewModel(private val addUserUseCase: AddUserUseCase, private val m
 
     override suspend fun handleIntent(intent: AddUserIntent, state: AddUserState): AddUserIntent? {
         return when (intent) {
+            is ChangeName -> {
+                null
+            }
+
+            is ChangeDescription -> {
+                null
+            }
+
+            is ValidateName -> {
+                null
+            }
+
+            is ValidateDescription -> {
+                null
+            }
+
             is AddUser -> {
-                if (intent.name.isNotEmpty() and intent.description.isNotEmpty()) {
-                    try {
-                        addUserUseCase(
-                            mapper.mapFromUiToDomain(
-                                UserUiModel(
-                                    name = intent.name,
-                                    description = intent.description
-                                )
+                try {
+                    addUserUseCase(
+                        mapper.mapFromUiToDomain(
+                            UserUiModel(
+                                name = state.user.name,
+                                description = state.user.description
                             )
                         )
-                        triggerSingleEvent(AddUserEvent.ShowToast("User added"))
-                    } catch (e: Exception) {
-                        triggerSingleEvent(AddUserEvent.ShowToast("Something wrong when adding user"))
-                    }
-                } else {
-                    triggerSingleEvent(AddUserEvent.ShowToast("Please input name and description"))
+                    )
+                    CompleteAddUser
+                } catch (e: Exception) {
+                    triggerSingleEvent(AddUserEvent.ShowToast("Something wrong when adding user"))
+                    CompleteAddUser
                 }
+            }
+
+            is CompleteAddUser -> {
+                triggerSingleEvent(AddUserEvent.ShowToast("User added"))
                 null
             }
 
@@ -53,16 +75,43 @@ class AddUserViewModel(private val addUserUseCase: AddUserUseCase, private val m
     class AddUserReducer : Reducer<AddUserState, AddUserIntent> {
         override fun reduce(state: AddUserState, intent: AddUserIntent): AddUserState {
             return when (intent) {
+                is ChangeName -> {
+                    state.copy(user = state.user.copy(name = intent.name))
+                }
+
+                is ChangeDescription -> {
+                    state.copy(user = state.user.copy(description = intent.description))
+                }
+
+                is ValidateName -> {
+                    state.copy(
+                        isNameError = state.user.name.isEmpty()
+                    )
+                }
+
+                is ValidateDescription -> {
+                    state.copy(
+                        isDescriptionError = state.user.description.isEmpty()
+                    )
+                }
+
                 is AddUser -> {
-                    AddUserState(!state.isInProcess)
+                    state.copy(isLoading = true)
+                }
+
+                is CompleteAddUser -> {
+                    state.copy(
+                        isLoading = false,
+                        user = UserUiModel()
+                    )
                 }
 
                 is ChangeUser -> {
-                    AddUserState(!state.isInProcess)
+                    AddUserState()
                 }
 
                 is DeleteUser -> {
-                    AddUserState(!state.isInProcess)
+                    AddUserState()
                 }
 
             }

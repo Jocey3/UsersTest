@@ -22,7 +22,6 @@ val dataModule = module {
     single { UserMapper() }
 
     single<RepositoryUsers> { RepositoryUsersImpl(get(), get()) }
-    single { UserMapper() }
 }
 
 fun provideRoomDatabase(context: Context): UsersDb {

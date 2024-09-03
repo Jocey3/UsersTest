@@ -44,7 +44,9 @@ abstract class BaseViewModel<S : State, I : Intent, E : SingleEvent> : ViewModel
             _intent.collect {
                 reduceInternal(_viewState.value, it)
                 launch {
-                    handleIntent(it, _viewState.value)?.let { newIntent -> sendIntent(newIntent) }
+                    handleIntent(it, _viewState.value)?.let { newIntent ->
+                        sendIntent(newIntent)
+                    }
                 }
             }
         }
