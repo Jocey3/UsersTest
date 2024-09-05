@@ -62,6 +62,11 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material)
     testImplementation(libs.junit)
+    testImplementation(libs.org.mockito)
+    testImplementation(libs.org.mockito.kotlin)
+    testImplementation(libs.androidx.paging.common)
+    testImplementation(libs.org.jetbrains.kotlinx)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
