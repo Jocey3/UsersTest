@@ -7,4 +7,8 @@ class UserMapper {
     fun mapFromUiToDomain(model: UserUiModel): UserDomainModel {
         return UserDomainModel(id = model.id, name = model.name, description = model.description)
     }
+
+    fun mapFromDomainToUi(model: UserDomainModel): UserUiModel {
+        return UserUiModel(id = model.id, name = model.name, description = model.description)
+    }
 }

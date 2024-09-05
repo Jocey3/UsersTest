@@ -1,15 +1,25 @@
 package com.users.test.presentation.screens.list_users
 
-import com.users.test.domain.use_case.AddUserUseCase
+import android.util.Log
+import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
+import androidx.paging.map
+import com.users.test.domain.use_case.GetUsersUseCase
 import com.users.test.presentation.mapper.UserMapper
 import com.users.test.presentation.mvi_base.BaseViewModel
 import com.users.test.presentation.screens.list_users.UserListIntent.LoadUsers
 import com.users.test.presentation.screens.list_users.UserListIntent.ShowUsers
+import kotlinx.coroutines.flow.map
 
 class UserListViewModel(
-    private val addUserUseCase: AddUserUseCase,
+    private val getUsersUseCase: GetUsersUseCase,
     private val mapper: UserMapper
 ) : BaseViewModel<UserListState, UserListIntent, UserListEvent>() {
+
+    init {
+        sendIntent(LoadUsers)
+    }
+
     override val reducer: Reducer<UserListState, UserListIntent>
         get() = UserListReducer()
 
@@ -23,6 +33,15 @@ class UserListViewModel(
     ): UserListIntent? {
         return when (intent) {
             is LoadUsers -> {
+                val userListFlow = getUsersUseCase()
+                    .map { pagingData ->
+                        pagingData.map { userDomainModel ->
+                            Log.d("myLog", userDomainModel.toString())
+                            mapper.mapFromDomainToUi(userDomainModel)
+                        }
+                    }
+                    .cachedIn(viewModelScope)
+                sendIntent(ShowUsers(userListFlow))
                 null
             }
 
@@ -35,13 +54,9 @@ class UserListViewModel(
     class UserListReducer : Reducer<UserListState, UserListIntent> {
         override fun reduce(state: UserListState, intent: UserListIntent): UserListState {
             return when (intent) {
-                is LoadUsers -> {
-                    state
-                }
+                is LoadUsers -> state.copy(isLoading = true)
+                is ShowUsers -> state.copy(isLoading = false, userListFlow = intent.userList)
 
-                is ShowUsers -> {
-                    state
-                }
             }
         }
 

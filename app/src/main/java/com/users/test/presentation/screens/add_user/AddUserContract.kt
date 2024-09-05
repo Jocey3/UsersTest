@@ -7,6 +7,7 @@ import com.users.test.presentation.mvi_base.State
 
 data class AddUserState(
     val isLoading: Boolean = false,
+    val isUpdating: Boolean = false,
     val user: UserUiModel = UserUiModel(),
     val isNameError: Boolean = false,
     val isDescriptionError: Boolean = false,
@@ -18,9 +19,10 @@ sealed class AddUserIntent : Intent {
     data object ValidateName : AddUserIntent()
     data object ValidateDescription : AddUserIntent()
     data object AddUser : AddUserIntent()
-    data class ChangeUser(val user: UserUiModel) : AddUserIntent()
-    data class DeleteUser(val user: UserUiModel) : AddUserIntent()
-    data object CompleteAddUser : AddUserIntent()
+    data class GetUser(val userId: Int) : AddUserIntent()
+    data class ShowUser(val user: UserUiModel) : AddUserIntent()
+    data object UpdateUser : AddUserIntent()
+    data object CompleteUser : AddUserIntent()
 }
 
 sealed class AddUserEvent : SingleEvent {

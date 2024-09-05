@@ -15,13 +15,16 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.users.test.presentation.screens.add_user.AddUserScreen
 import com.users.test.presentation.screens.list_users.UserListScreen
 import com.users.test.presentation.util.AppRoutes
+import com.users.test.presentation.util.Args.USER_ID
 
 
 @Composable
@@ -52,7 +55,7 @@ fun AppNavigationComponent(modifier: Modifier = Modifier) {
                                 // reselecting the same item
                                 launchSingleTop = true
                                 // Restore state when reselecting a previously selected item
-                                restoreState = true
+                                restoreState = false
                             }
                         }
                     )
@@ -77,8 +80,26 @@ fun AppNavigationComponent(modifier: Modifier = Modifier) {
                 fadeOut(targetAlpha = 1f, animationSpec = snap())
             }
         ) {
-            composable(AppRoutes.AddUserRoute.route) { AddUserScreen() }
-            composable(AppRoutes.ListUsersRoute.route) { UserListScreen() }
+            composable(
+                AppRoutes.AddUserRoute.route,
+                arguments = listOf(navArgument(name = USER_ID) {
+                    type = NavType.StringType
+                })
+            ) { backStackEntry ->
+                val userId = backStackEntry.arguments?.getString(USER_ID)
+                AddUserScreen(userId = userId)
+            }
+            composable(AppRoutes.ListUsersRoute.route) {
+                UserListScreen(
+                    navigateToUser = { userId ->
+                        navController.navigate(
+                            AppRoutes.AddUserRoute.route.replace(
+                                oldValue = "{$USER_ID}",
+                                newValue = userId
+                            )
+                        )
+                    })
+            }
         }
     }
 }

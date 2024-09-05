@@ -80,4 +80,10 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     kapt(libs.room.compiler)
+
+    //Paging
+    implementation(libs.androidx.paging)
+    implementation(libs.androidx.room)
+    implementation(libs.androidx.paging.compose.android)
+
 }

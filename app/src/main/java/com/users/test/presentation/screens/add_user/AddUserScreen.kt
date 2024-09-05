@@ -1,6 +1,8 @@
 package com.users.test.presentation.screens.add_user
 
+import android.app.Activity
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,16 +28,22 @@ import com.users.test.presentation.screens.add_user.AddUserEvent.ShowToast
 import com.users.test.presentation.screens.add_user.AddUserIntent.AddUser
 import com.users.test.presentation.screens.add_user.AddUserIntent.ChangeDescription
 import com.users.test.presentation.screens.add_user.AddUserIntent.ChangeName
+import com.users.test.presentation.screens.add_user.AddUserIntent.UpdateUser
 import com.users.test.presentation.screens.add_user.AddUserIntent.ValidateDescription
 import com.users.test.presentation.screens.add_user.AddUserIntent.ValidateName
 import com.users.test.presentation.util.EventConsumer
 import org.koin.androidx.compose.getViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
-fun AddUserScreen() {
+fun AddUserScreen(userId: String? = null) {
     val context = LocalContext.current
-    val viewModel: AddUserViewModel = getViewModel()
+    val viewModel: AddUserViewModel = getViewModel() { parametersOf(userId.toString()) }
     val state by viewModel.viewState.collectAsState()
+
+    BackHandler {
+        (context as Activity).finish()
+    }
 
     AddUserContent(
         state,
@@ -44,12 +52,13 @@ fun AddUserScreen() {
         validateName = { viewModel.sendIntent(ValidateName) },
         validateDescription = { viewModel.sendIntent(ValidateDescription) },
         clickAdd = {
-            if (state.user.name.isNotEmpty() and state.user.description.isNotEmpty()) {
-                viewModel.sendIntent(AddUser)
+            if (state.isUpdating) {
+                viewModel.sendIntent(UpdateUser)
             } else {
-                viewModel.triggerSingleEvent(ShowToast("Please input name and description"))
+                viewModel.sendIntent(ValidateName)
+                viewModel.sendIntent(ValidateDescription)
+                viewModel.sendIntent(AddUser)
             }
-
         })
 
     EventConsumer(viewModel.eventChannel) {
@@ -90,7 +99,7 @@ fun AddUserContent(
             value = state.user.name,
             onValueChange = {
                 changeName(it)
-                validateName()
+                if (!state.isUpdating) validateName()
             },
             label = { Text(stringResource(R.string.name)) },
             isError = state.isNameError,
@@ -113,7 +122,7 @@ fun AddUserContent(
             value = state.user.description,
             onValueChange = {
                 changeDescription(it)
-                validateDescription()
+                if (!state.isUpdating) validateDescription()
             },
             label = { Text(stringResource(R.string.description)) },
             isError = state.isDescriptionError,
@@ -130,15 +139,14 @@ fun AddUserContent(
             )
         } else {
             Button(
-                onClick = {
-                    validateName()
-                    validateDescription()
-                    clickAdd()
-                },
+                onClick = { clickAdd() },
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Text(stringResource(R.string.add))
+                Text(
+                    text = if (state.isUpdating) stringResource(R.string.update)
+                    else stringResource(R.string.add)
+                )
             }
         }
     }
