@@ -64,7 +64,7 @@ fun AppNavigationComponent(modifier: Modifier = Modifier) {
         }
     ) { innerPadding ->
         NavHost(
-            modifier = modifier.padding(innerPadding),
+            modifier = Modifier.padding(innerPadding),
             navController = navController,
             startDestination = AppRoutes.AddUserRoute.route,
             enterTransition = {

@@ -4,8 +4,12 @@ import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
@@ -17,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
@@ -108,12 +113,50 @@ fun UserListContent(
 
 @Composable
 fun UserListItem(user: UserUiModel, onClick: () -> Unit) {
-    Text(
-        text = user.name,
+    Row(
         modifier = Modifier
-            .clickable(onClick = onClick)
-            .padding(16.dp)
-    )
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        val wordCount = user.description.split("\\s+".toRegex()).size
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Name:",
+                color = Color.Gray
+            )
+            Text(
+                text = user.name,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Description:",
+                color = Color.Gray
+            )
+            Text(
+                text = user.description,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Display the word count of the description
+            Text(
+                text = "Word Count: $wordCount words",
+                color = Color.Gray,
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
